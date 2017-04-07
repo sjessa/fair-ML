@@ -6,3 +6,6 @@ For our final project for COMP 551: Applied Machine Learning at McGill Universit
 Selin Jessa  
 Elsa Riachi  
 Adam Cavatassi  
+
+## Run instructions
+1. Run `./01-download_data.sh` to download the UMI Communities & Crime dataset to a `data` directory
