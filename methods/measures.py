@@ -12,7 +12,7 @@ def discKC(X, y, S, b, d):
 	be given by labeled training data, or by the prediction from a classifier.
 
 	Args:
-		D (DataFrame): Data
+		X (DataFrame): Data
 		y (list): Binary class labels or predictions for data
 		S (str): Name of sensitive attribute (binary)
 		b: Protected value for sensitive attribute, 0 or 1
