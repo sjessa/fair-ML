@@ -16,7 +16,7 @@ bash 01-download_data.sh
 Rscript 02-prepare_data.R  
 ```
 
-This downloads the Communities & Crime and Census datasets to a `data` directory, and the tidies up data for training learners. The results are `data/census/census_clean.tsv` where `black` is the sensitive attribute and `crime` the class, and `data/crime/crime_clean.tsv` where `sex` is the sensitive attribute and `income` the class.
+This downloads the Communities & Crime and Census datasets to a `data` directory, and the tidies up data for training learners. The results are `data/census/census_clean.tsv` where `sex` is the sensitive attribute and `income` the class, and `data/crime/crime_clean.tsv`, where `black` is the sensitive attribute and `crime` the class
 
 ### Train baseline classifiers on the Crime dataset
 ```

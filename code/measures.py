@@ -1,3 +1,7 @@
+# -------------------------------------------------------------- #
+#   Implementations of various measures of discrimination        #
+# -------------------------------------------------------------- #
+
 import numpy as np
 import pandas as pd
 
@@ -22,7 +26,7 @@ def discKC(X, y, S, b, d):
 	D = X.copy()
 	D['class'] = y
 
-	# Fraction of eDamples with non-protected value for S in desired class d
+	# Fraction of examples with non-protected value for S in desired class d
 	disc = len(D[(D[S] != b) & (D['class'] == d)]) / float(len(D[D[S] != b])) \
 			- len(D[(D[S] == b) & (D['class'] == d)]) / float(len(D[D[S] == b]))
 

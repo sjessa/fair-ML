@@ -1,3 +1,10 @@
+# -------------------------------------------------------------- #
+#   Implementations of data preprocessing techniques to          #
+#   reduce discrimination in a dataset (i.e. transform the       #
+#   dataset so that in theory, a discriminatory model can't      #
+#   be learned on it)                                            #
+# -------------------------------------------------------------- #
+
 import numpy as np
 import pandas as pd
 import itertools
@@ -46,7 +53,7 @@ def massage(X, y, S, b, d):
 	# Non-candidates
 	non = X[((X[S] == b) & (X['class'] == d)) | ((X[S] != b) & (X['class'] != d))]
 
-    # Calculate the discrimination in the dataset
+	# Calculate the discrimination in the dataset
 	disc = discKC(X, y, S, b, d)
 
 	# Calculate M, the number of labels which need to be modified

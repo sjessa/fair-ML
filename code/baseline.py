@@ -1,5 +1,5 @@
 # -------------------------------------------------------------- #
-#   Train three baseline classifiers on the Crime dataset           #
+#   Train three baseline classifiers on the Crime dataset        #
 # -------------------------------------------------------------- #
 
 import pandas as pd
@@ -22,25 +22,11 @@ def main():
 	X = X.as_matrix()
 	y = np.asarray(data['crime'].tolist())
 
-	print("Now training a baseline Gaussian NB classifier...")
-	gnb = GaussianNB()
-	gnb_auc = baseline(gnb, "output/roc_gnb.csv", "output/predictions_gnb.csv", X, y)
-
-	print("Now training a baseline SVM...")
-	svm = SVC(kernel = 'linear', probability = True)
-	svm_auc = baseline(svm, "output/roc_svm.csv", "output/predictions_svm.csv", X, y)
-
-	print("Now training a baseline logistic regression model...")
-	logr = LogisticRegression(penalty = 'l2')
-	logr_auc = baseline(logr, "output/roc_logr.csv", "output/predictions_logr.csv", X, y)
-
-	classifier = ["gnb", "svm", "logr"]
-	auc = [gnb_auc, svm_auc, logr_auc]
-	scores = pd.DataFrame({'classifier': classifier, 'auc': auc})
-	scores.to_csv("output/auc_baseline.csv", index = False)
+	learn_baselines(X, y, "baseline", weights = True)
 
 
-def baseline(classifier, roc_out, preds_out, X, y):
+
+def learn_classifier(classifier, roc_out, preds_out, X, y):
 
 	preds = pd.DataFrame()
 	roc = pd.DataFrame()
@@ -82,6 +68,40 @@ def baseline(classifier, roc_out, preds_out, X, y):
 	print("AUC: " + str(auc_score))
 
 	return(auc_score)
+
+
+
+def learn_baselines(X, y, technique, weights = False):
+
+	print("Training baseline classifiers for: " + technique)
+
+	print("--- Now training a baseline Gaussian NB classifier...")
+	gnb = GaussianNB()
+	gnb_auc = learn_classifier(gnb,
+		"output/" + technique + "_roc_gnb.csv",
+		"output/" + technique + "_predictions_gnb.csv", X, y)
+
+	print("--- Now training a baseline SVM...")
+	svm = SVC(kernel = 'linear', probability = True)
+	svm_auc = learn_classifier(svm,
+		"output/" + technique + "_roc_svm.csv",
+		"output/" + technique + "_predictions_svm.csv", X, y)
+
+	print("--- Now training a baseline logistic regression model...")
+	logr = LogisticRegression(penalty = 'l2')
+	logr_auc = learn_classifier(logr,
+		"output/" + technique + "_roc_logr.csv",
+		"output/" + technique + "_predictions_logr.csv", X, y)
+
+	if weights:
+		weights = pd.DataFrame(logr.coef_)
+		weights.to_csv("output/" + technique + "_logr_weights.csv", index = False)
+
+	classifier = ["gnb", "svm", "logr"]
+	auc = [gnb_auc, svm_auc, logr_auc]
+	scores = pd.DataFrame({'classifier': classifier, 'auc': auc})
+	scores.to_csv("output/" + technique + "_auc.csv", index = False)
+
 
 
 if __name__ == '__main__':
