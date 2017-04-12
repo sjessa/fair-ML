@@ -74,6 +74,7 @@ def massage(X, y, S, b, d):
 	return(X_prime, y_prime)
 
 
+
 def reweigh(X, y, S):
 	"""Implementation of the 'massaging' data preprocessing technique
 	given by Algorithm 3 from Kamiran and Calders (2012)
@@ -179,6 +180,7 @@ def uniform_sample(X, y, S, b, d):
 	X_prime = X_prime.drop('label', axis = 1)
 
 	return(X_prime, y_prime)
+
 
 
 def main():

@@ -14,14 +14,15 @@ roc <- Map(function(df, nm) mutate(df, method_model = nm), roc_list, roc_paths) 
     .$method == "baseline" ~ "None",
     .$method == "massage" ~ "Massaging",
     .$method == "reweighed" ~ "Reweighting",
-    .$method == "unisample" ~ "Uniform sampling"
+    .$method == "unisample" ~ "Uniform sampling",
+    .$method == "2nb" ~ "2 Naive Bayes"
   )) %>% 
-  mutate(tpr = tpr/10) %>% 
+  #mutate(tpr = ifelsetpr/10) %>% 
   select(-data)
 
-roc$method = factor(roc$method, levels = c("None", "Massaging", "Reweighting", "Uniform sampling"))
+roc$method = factor(roc$method, levels = c("None", "Massaging", "Reweighting", "Uniform sampling", "2 Naive Bayes"))
 
-auc_methods <- c("baseline", "massage", "reweighed")
+auc_methods <- c("baseline", "massage", "reweighed", "2nb")
 auc_list <- list.files("../code/output", pattern = "*auc*", full.names = TRUE) %>% 
   lapply(read_csv)
 
@@ -32,7 +33,8 @@ roc_plot <- roc %>% ggplot(aes(x = fpr, y = tpr, colour = method)) +
   geom_line() +
   facet_wrap(~ model) +
   xlab("FPR") + ylab("TPR") +
-  ggtitle("ROC curves for baseline learners on raw and pre-processed data") +
-  guides(colour = guide_legend(title = "Method"))
+  ggtitle("ROC curves for discrimination-reduction methods") +
+  guides(colour = guide_legend(title = "Method")) +
+  theme_bw()
   
-ggsave("../figures/roc_baseline_preprocessing.pdf", width = 10, height = 3.5)
+ggsave("../figures/roc.pdf", width = 10, height = 3.5)

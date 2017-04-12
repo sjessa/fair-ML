@@ -38,3 +38,15 @@ $ python learn_preprocessed.py
 $ cd ../analysis
 $ Rscript compare_preprocessing_methods.R
 ```
+
+### Run in-processing methods to reduce discrimination
+
+```
+$ cd code
+$ python two_naive_bayes.py
+```
+
+This runs the 2NB approach proposed by Calders & Verwer (2010), and measures the discrimination in the resulting labels.
+
+
+
