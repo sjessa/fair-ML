@@ -10,8 +10,16 @@ roc <- Map(function(df, nm) mutate(df, method_model = nm), roc_list, roc_paths) 
   separate(method_model, into = c("method", "data", "model"), sep = "_") %>%
   mutate(method = substr(method, 17, nchar(method)),
          model = substr(model, 1, nchar(model)-4)) %>% 
+  mutate(method = case_when(
+    .$method == "baseline" ~ "None",
+    .$method == "massage" ~ "Massaging",
+    .$method == "reweighed" ~ "Reweighting",
+    .$method == "unisample" ~ "Uniform sampling"
+  )) %>% 
   mutate(tpr = tpr/10) %>% 
   select(-data)
+
+roc$method = factor(roc$method, levels = c("None", "Massaging", "Reweighting", "Uniform sampling"))
 
 auc_methods <- c("baseline", "massage", "reweighed")
 auc_list <- list.files("../code/output", pattern = "*auc*", full.names = TRUE) %>% 
