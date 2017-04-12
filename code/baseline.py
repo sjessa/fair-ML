@@ -27,6 +27,7 @@ def main():
 
 
 def learn_classifier(classifier, roc_out, preds_out, X, y):
+	# These expect that X is a matrix
 
 	preds = pd.DataFrame()
 	roc = pd.DataFrame()
