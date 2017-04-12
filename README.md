@@ -30,14 +30,9 @@ This trains three out-of-the-box classifiers: a Gaussian Naive Bayes classifier,
 ```
 $ cd code
 $ python preprocessing.py
+$ python learn_preprocessed.py
 ```
 This will transform the Crime dataset using three methods proposed by Kamiran & Calders (2012). To train the baseline classifiers on the transformed data and plot ROC curves:
-```
-$ cd code
-$ python learn_preprocessed.py
-$ cd ../analysis
-$ Rscript compare_preprocessing_methods.R
-```
 
 ### Run in-processing methods to reduce discrimination
 
@@ -48,5 +43,10 @@ $ python two_naive_bayes.py
 
 This runs the 2NB approach proposed by Calders & Verwer (2010), and measures the discrimination in the resulting labels.
 
+### Analyze the results
 
-
+Plot ROC curves:
+```
+$ cd ../analysis
+$ Rscript compare_preprocessing_methods.R
+```
