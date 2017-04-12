@@ -57,12 +57,12 @@ def learn_classifier(classifier, roc_out, preds_out, X, y):
 			'class': y_test})
 		preds = preds_df.append(preds)
 
+	mean_tpr /= 10
 	roc = pd.DataFrame({'tpr': mean_tpr, 'fpr': mean_fpr})
 	
 	roc.to_csv(roc_out, index = False)
 	preds.to_csv(preds_out, index = False)
 
-	mean_tpr /= 10
 	mean_tpr[-1] = 1.0
 	auc_score = auc(mean_fpr, mean_tpr)
 	print("AUC: " + str(auc_score))
@@ -71,7 +71,7 @@ def learn_classifier(classifier, roc_out, preds_out, X, y):
 
 
 
-def learn_baselines(X, y, technique, weights = False):
+def learn_baselines(X, y, technique, weights = False, run_svm = True):
 
 	print("Training baseline classifiers for: " + technique)
 
@@ -81,11 +81,12 @@ def learn_baselines(X, y, technique, weights = False):
 		"output/" + technique + "_roc_gnb.csv",
 		"output/" + technique + "_predictions_gnb.csv", X, y)
 
-	print("--- Now training a baseline SVM...")
-	svm = SVC(kernel = 'linear', probability = True)
-	svm_auc = learn_classifier(svm,
-		"output/" + technique + "_roc_svm.csv",
-		"output/" + technique + "_predictions_svm.csv", X, y)
+	if run_svm:
+		print("--- Now training a baseline SVM...")
+		svm = SVC(kernel = 'linear', probability = True)
+		svm_auc = learn_classifier(svm,
+			"output/" + technique + "_roc_svm.csv",
+			"output/" + technique + "_predictions_svm.csv", X, y)
 
 	print("--- Now training a baseline logistic regression model...")
 	logr = LogisticRegression(penalty = 'l2')

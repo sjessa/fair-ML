@@ -44,7 +44,7 @@ def main():
 	X3 = X3.as_matrix()
 	y3 = np.asarray(data3['crime'].tolist())
 
-	learn_baselines(X3, y3, "unisample")
+	learn_baselines(X3, y3, "unisample", run_svm = False)
 
 
 
