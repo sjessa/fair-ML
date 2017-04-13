@@ -1,0 +1,23 @@
+# statistical tests
+
+# regression slope test, with protected feature s, only applies to regression
+    # calculation of standard error
+s = trainX[:,protected_feature]
+b = 0.1  # b is the weight of the regression function for protected feature s
+
+tmp = trainY-trainY_pred  # root mean square error of prediction
+tmp = np.power(tmp,2)
+tmp = np.sum(tmp)
+tmp = np.sqrt(tmp)
+
+    # t-test with n-2 degrees of freedom applied
+t_test = np.sqrt((len(trainY)-2))
+
+tmp2 = s-np.mean(s)  # root mean square error of prediction
+tmp2 = np.power(tmp2,2)
+tmp2 = np.sum(tmp)
+tmp2 = np.sqrt(tmp)
+
+std_err = tmp/(t_test*tmp2) # standard error; sigma
+t = b/std_err  # regression slope test checks if the regression coefficient has an absolute value significantly greater than 0
+
