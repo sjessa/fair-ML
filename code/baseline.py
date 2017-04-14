@@ -19,7 +19,6 @@ def main():
 	data = pd.read_csv('../data/crime/crime_clean.tsv', sep = '\t')
 	data = shuffle(data)
 	X = data.drop(['crime'], axis = 1)
-	X = X.as_matrix()
 	y = np.asarray(data['crime'].tolist())
 
 	learn_baselines(X, y, "baseline", weights = True)
@@ -27,8 +26,9 @@ def main():
 
 
 def learn_classifier(classifier, roc_out, preds_out, X, y):
-	# These expect that X is a matrix
+	# This expects that X is a DataFrame
 
+	Xm = X.as_matrix()
 	preds = pd.DataFrame()
 	roc = pd.DataFrame()
 
@@ -37,8 +37,8 @@ def learn_classifier(classifier, roc_out, preds_out, X, y):
 	mean_tpr = 0.0
 	mean_fpr = np.linspace(0, 1, 100)
 
-	for train, test in cv.split(X):
-		X_train, X_test = X[train], X[test]
+	for train, test in cv.split(Xm):
+		X_train, X_test = Xm[train], Xm[test]
 		y_train, y_test = y[train], y[test]
 
 		classifier.fit(X_train, y_train)
@@ -64,8 +64,15 @@ def learn_classifier(classifier, roc_out, preds_out, X, y):
 	roc.to_csv(roc_out, index = False)
 
 	# Join with the data since it was shuffled
-	preds = preds.join(pd.DataFrame(X))
-	preds.to_csv(preds_out, index = False)
+	new_idx = range(0, 1993)
+	X['idx'] = new_idx
+	X = X.set_index(['idx'], drop = True)
+
+	preds['idx'] = new_idx
+	preds = preds.set_index(['idx'], drop = True)
+
+	X = X.join(preds)
+	X.to_csv(preds_out, index = False)
 
 	mean_tpr[-1] = 1.0
 	auc_score = auc(mean_fpr, mean_tpr)

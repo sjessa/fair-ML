@@ -23,7 +23,7 @@ def main():
 	data = pd.read_csv('output/crime_massaged.csv')
 	data = shuffle(data)
 	X = data.drop(['crime'], axis = 1)
-	X = X.as_matrix()
+	#X = X.as_matrix()
 	y = np.asarray(data['crime'].tolist())
 
 	learn_baselines(X, y, "massage")
@@ -32,7 +32,7 @@ def main():
 	data2 = pd.read_csv('output/crime_reweighed.csv')
 	data2 = shuffle(data2)
 	X2 = data2.drop(['crime'], axis = 1)
-	X2 = X2.as_matrix()
+	#X2 = X2.as_matrix()
 	y2 = np.asarray(data2['crime'].tolist())
 
 	learn_baselines(X2, y2, "reweighed")
@@ -41,7 +41,7 @@ def main():
 	data3 = pd.read_csv('output/crime_unisample.csv')
 	data3 = shuffle(data3)
 	X3 = data3.drop(['crime'], axis = 1)
-	X3 = X3.as_matrix()
+	#X3 = X3.as_matrix()
 	y3 = np.asarray(data3['crime'].tolist())
 
 	learn_baselines(X3, y3, "unisample", run_svm = False)
