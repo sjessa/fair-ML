@@ -60,8 +60,11 @@ def learn_classifier(classifier, roc_out, preds_out, X, y):
 
 	mean_tpr /= 10
 	roc = pd.DataFrame({'tpr': mean_tpr, 'fpr': mean_fpr})
-	
+
 	roc.to_csv(roc_out, index = False)
+
+	# Join with the data since it was shuffled
+	preds = preds.join(pd.DataFrame(X))
 	preds.to_csv(preds_out, index = False)
 
 	mean_tpr[-1] = 1.0
