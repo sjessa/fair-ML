@@ -21,8 +21,7 @@ def main():
 	X = data.drop(['crime'], axis = 1)
 	y = np.asarray(data['crime'].tolist())
 
-	learn_baselines(X, y, "baseline", weights = True)
-
+	learn_baselines(X, y, "baseline", weights = True, run_svm = True)
 
 
 def learn_classifier(classifier, roc_out, preds_out, X, y):
@@ -36,8 +35,12 @@ def learn_classifier(classifier, roc_out, preds_out, X, y):
 
 	mean_tpr = 0.0
 	mean_fpr = np.linspace(0, 1, 100)
+	k = 0
 
 	for train, test in cv.split(Xm):
+		k += 1
+		print("k = " + str(k))
+
 		X_train, X_test = Xm[train], Xm[test]
 		y_train, y_test = y[train], y[test]
 
@@ -65,15 +68,18 @@ def learn_classifier(classifier, roc_out, preds_out, X, y):
 
 	# Join with the data since it was shuffled
 	new_idx = range(0, 1993)
-	X['idx'] = new_idx
-	X = X.set_index(['idx'], drop = True)
+	X_out = X.copy()
+	X_out['idx'] = new_idx
+	X_out = X_out.set_index(['idx'], drop = True)
 
 	preds['idx'] = new_idx
 	preds = preds.set_index(['idx'], drop = True)
 
-	X = X.join(preds)
-	X.to_csv(preds_out, index = False)
+	X_out = X_out.join(preds)
+	X_out.to_csv(preds_out, index = False)
 
+	#print(list(X))
+	#X = X.drop('idx', axis=1)
 	mean_tpr[-1] = 1.0
 	auc_score = auc(mean_fpr, mean_tpr)
 	print("AUC: " + str(auc_score))
