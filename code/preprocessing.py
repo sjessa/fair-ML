@@ -220,6 +220,29 @@ def main():
 	X_prime3['crime'] = y_prime3
 	X_prime3.to_csv("output/crime_unisample.csv", index = False)
 
+	# On recidivism dataset
+	recid = pd.read_csv('../data/recidivism/recidivism_clean.csv')
+	Xr = recid.drop('recidivism', axis = 1)
+	yr = np.asarray(recid['recidivism'].tolist())
+
+	print(discKC(Xr, yr, 'non_white', 1, 0))
+	
+	Xr_1, yr_1 = massage(Xr, yr, 'non_white', 1, 0)
+	Xr_1['recidivism'] = yr_1
+	Xr_1.to_csv("output/recidivism_massaged.csv", index = False)
+	print(discKC(Xr_1, yr_1, 'non_white', 1, 0))
+
+	Xr_2, yr_2 = reweigh(Xr, yr, 'non_white')
+	Xr_2['recidivism'] = yr_2
+	Xr_2.to_csv("output/recidivism_reweighed.csv", index = False)
+	print(discKC(Xr_2, yr_2, 'non_white', 1, 0))
+
+	Xr_3, yr_3 = massage(Xr, yr, 'non_white', 1, 0)
+	Xr_3['recidivism'] = yr_3
+	Xr_3.to_csv("output/recidivism_unisample.csv", index = False)
+	print(discKC(Xr_3, yr_3, 'non_white', 1, 0))
+
+	
 
 
 if __name__ == '__main__':

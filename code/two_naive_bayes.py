@@ -20,14 +20,25 @@ from measures import discKC
 
 def main():
 
+	# CRIME
 	data = pd.read_csv('../data/crime/crime_clean.tsv', sep = '\t')
 	data = shuffle(data)
 	X = data.drop(['crime'], axis = 1)
 	y = np.asarray(data['crime'].tolist())
 
 	print(discKC(X, y, 'black', 1, 0))
-	y_hat = two_nb(X, y, 'black')
+	y_hat = two_nb(X, y, 'black', 'crime')
 	print(discKC(X, y_hat.tolist(), 'black', 1, 0))
+
+	# RECIDIVISM
+	data2 = pd.read_csv('../data/recidivism/recidivism_clean.csv')
+	data2 = shuffle(data2)
+	Xr = data2.drop(['recidivism'], axis = 1)
+	yr = np.asarray(data2['recidivism'].tolist())
+
+	print(discKC(Xr, yr, 'non_white', 1, 0))
+	yr_hat = two_nb(Xr, yr, 'non_white', 'recidivism')
+	print(discKC(Xr, yr_hat.tolist(), 'non_white', 1, 0))
 
 
 def split_on_sensitive_attribute(X, y, S):
@@ -55,7 +66,7 @@ def split_on_sensitive_attribute(X, y, S):
 
 
 
-def two_nb(X, y, S):
+def two_nb(X, y, S, dataset):
 	"""Implementation of the two Naive Bayes models method for reducing discrimination
 	in classification proposed by Calders and Verwer (2010)
 
@@ -123,7 +134,7 @@ def two_nb(X, y, S):
 	mean_tpr /= 10
 	roc = pd.DataFrame({'tpr': mean_tpr, 'fpr': mean_fpr})
 	
-	roc.to_csv("output/2nb_roc_gnb.csv", index = False)
+	roc.to_csv("output/" + dataset + "2nb_roc_gnb.csv", index = False)
 
 	X_out = X.copy()
 	new_idx = range(0, len(X.index))
@@ -131,7 +142,7 @@ def two_nb(X, y, S):
 	X_out = X_out.set_index(['idx'], drop = True)
 
 	X_out = X_out.join(preds)
-	X_out.to_csv("output/2nb_predictions_gnb.csv", index = False)
+	X_out.to_csv("output/" + dataset + "2nb_predictions_gnb.csv", index = False)
 
 	#preds.to_csv(, index = False)
 
@@ -142,7 +153,7 @@ def two_nb(X, y, S):
 	classifier = ["2nb"]
 	auc_score = [auc_score]
 	scores = pd.DataFrame({'classifier': classifier, 'auc': auc_score})
-	scores.to_csv("output/2nb_auc.csv", index = False)
+	scores.to_csv("output/" + dataset + "2nb_auc.csv", index = False)
 
 	return(preds['pred'])
 
