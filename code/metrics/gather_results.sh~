@@ -28,7 +28,7 @@ find ../output -maxdepth 1 -name "*pred*" -print > predictions_list.txt
 while read prediction2
 do
     echo -n "$prediction2", >> accuracy.csv
-    python accuracy.py pred class "$prediction2" | cut -d' ' -f3 | paste -sd ',' >> accuracy.csv
+    python accuracy.py pred class "$prediction2" | cut -d' ' -f2 | paste -sd ',' >> accuracy.csv
   
 done < predictions_list.txt
 
