@@ -102,6 +102,8 @@ def learn_baselines(X, y, technique, weights = False, run_svm = True):
 		svm_auc = learn_classifier(svm,
 			"output/" + technique + "_roc_svm.csv",
 			"output/" + technique + "_predictions_svm.csv", X, y)
+	else:
+		svm_auc = 'NA'
 
 	print("--- Now training a baseline logistic regression model...")
 	logr = LogisticRegression(penalty = 'l2')
