@@ -124,7 +124,16 @@ def two_nb(X, y, S):
 	roc = pd.DataFrame({'tpr': mean_tpr, 'fpr': mean_fpr})
 	
 	roc.to_csv("output/2nb_roc_gnb.csv", index = False)
-	preds.to_csv("output/2nb_predictions_gnb.csv", index = False)
+
+	X_out = X.copy()
+	new_idx = range(0, len(X.index))
+	X_out['idx'] = new_idx
+	X_out = X_out.set_index(['idx'], drop = True)
+
+	X_out = X_out.join(preds)
+	X_out.to_csv("output/2nb_predictions_gnb.csv", index = False)
+
+	#preds.to_csv(, index = False)
 
 	mean_tpr[-1] = 1.0
 	auc_score = auc(mean_fpr, mean_tpr)
