@@ -1,7 +1,8 @@
+# 
+# ROC curves for pre-processed data & baseline classifiers
+#
+
 library(tidyverse)
-
-
-# ROC curves for pre-processed data & baseline classifiers ------------------- #
 
 roc_paths <- list.files("../code/output/", pattern = "*roc*", full.names = TRUE)
 roc_list <- roc_paths %>% lapply(read_csv)
@@ -17,7 +18,6 @@ roc <- Map(function(df, nm) mutate(df, method_model = nm), roc_list, roc_paths) 
     .$method == "unisample" ~ "Uniform sampling",
     .$method == "2nb" ~ "2 Naive Bayes"
   )) %>% 
-  #mutate(tpr = ifelsetpr/10) %>% 
   select(-data)
 
 roc$method = factor(roc$method, levels = c("None", "Massaging", "Reweighting", "Uniform sampling", "2 Naive Bayes"))
