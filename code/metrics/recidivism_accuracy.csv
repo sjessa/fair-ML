@@ -1,0 +1,8 @@
+,ACCURACY:,PRECISION:,RECALL:,F1 SCORE:,
+../output/recidivism-reweighed_predictions_logr.csv,0.681708536801,0.00388672959467,0.428571428571,0.00770359501101,
+../output/recidivism2nb_predictions_gnb.csv,0.34974014063,0.0638534147696,0.408767772512,0.110453017448,
+../output/recidivism-massage_predictions_gnb.csv,0.675472142143,0.0790301684249,0.441571871768,0.134065934066,
+../output/recidivism-reweighed_predictions_gnb.csv,0.740601282579,0.317971497316,0.703521703522,0.43798597833,
+../output/recidivism-massage_predictions_svm.csv,0.682120374184,0.0,ind,ind,
+../output/recidivism-massage_predictions_logr.csv,0.68547390716,0.0307236720341,0.603636363636,0.0584712927087,
+../output/recidivism-reweighed_predictions_svm.csv,0.682120374184,0.0,ind,ind,

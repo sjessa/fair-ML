@@ -23,7 +23,7 @@ done < predictions_list.txt
 echo ,ACCURACY:,PRECISION:,RECALL:,F1 SCORE:, > crime_accuracy.csv
 
 rm predictions_list.txt
-find ../output -maxdepth 1 -name "*pred*" ! -name "*recidivism*" -print > predictions_list.txt
+find ../output -maxdepth 1 -name "*pred*" ! -name "*recidivism*"-print > predictions_list.txt
 
 while read prediction2
 do

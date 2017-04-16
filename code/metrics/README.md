@@ -23,4 +23,4 @@ To collect the results for the recidivism dataset from all the learners thus far
 ./recidivism_gathering_results.sh
 ```
 
-The discrimination metrics for each of the classifiers will be written in `recidivism_comparison.csv`. 
+The discrimination metrics for each of the classifiers will be written in `recidivism_comparison.csv`, and the accuracy metrics for each of the predictions will be written in `recidivism_accuracy.csv`.
