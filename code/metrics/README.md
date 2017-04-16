@@ -14,3 +14,5 @@ To collect the results from all the learners thus far, simply run the `gathering
 ```
 ./gathering_results.sh
 ```
+
+The discrimination metrics for each of the classifiers will be written in `comparison.csv`.
