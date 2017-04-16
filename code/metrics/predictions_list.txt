@@ -1,5 +1,3 @@
-../output/crime_reweighed.csv
-../output/crime_massaged.csv
 ../output/massage_predictions_logr.csv
 ../output/massage_predictions_svm.csv
 ../output/baseline_predictions_logr.csv
