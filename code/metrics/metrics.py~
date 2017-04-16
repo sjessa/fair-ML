@@ -32,4 +32,4 @@ p_yneg_s0 = float(count[(0.0, np.abs(favourable_outcome-1))])/float(count[(0.0, 
 
 r_OR = (p_ypos_s1*p_yneg_s0)/(p_ypos_s0*p_yneg_s1)
 
-print "\nIMPACT RATIO: " +  str(r_I) + "\nELIFT RATIO: " +  str(r_E) + "\nODDS RATIO: " +  str(r_OR) + "\n"
+print "IMPACT RATIO: " +  str(r_I) + "\nELIFT RATIO: " +  str(r_E) + "\nODDS RATIO: " +  str(r_OR) + "\n"
