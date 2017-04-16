@@ -67,7 +67,7 @@ def learn_classifier(classifier, roc_out, preds_out, X, y):
 	roc.to_csv(roc_out, index = False)
 
 	# Join with the data since it was shuffled
-	new_idx = range(0, 1993)
+	new_idx = range(0, len(X.index))
 	X_out = X.copy()
 	X_out['idx'] = new_idx
 	X_out = X_out.set_index(['idx'], drop = True)
@@ -78,8 +78,6 @@ def learn_classifier(classifier, roc_out, preds_out, X, y):
 	X_out = X_out.join(preds)
 	X_out.to_csv(preds_out, index = False)
 
-	#print(list(X))
-	#X = X.drop('idx', axis=1)
 	mean_tpr[-1] = 1.0
 	auc_score = auc(mean_fpr, mean_tpr)
 	print("AUC: " + str(auc_score))
