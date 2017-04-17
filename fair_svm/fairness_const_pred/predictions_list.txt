@@ -1,10 +1,10 @@
-./fairness_const_test_set_predictions_5.csv
-./fairness_const_test_set_predictions_8.csv
-./fairness_const_test_set_predictions_2.csv
-./fairness_const_test_set_predictions_9.csv
 ./fairness_const_test_set_predictions_0.csv
-./fairness_const_test_set_predictions_4.csv
-./fairness_const_test_set_predictions_3.csv
 ./fairness_const_test_set_predictions_1.csv
+./fairness_const_test_set_predictions_2.csv
+./fairness_const_test_set_predictions_3.csv
+./fairness_const_test_set_predictions_4.csv
+./fairness_const_test_set_predictions_5.csv
 ./fairness_const_test_set_predictions_6.csv
 ./fairness_const_test_set_predictions_7.csv
+./fairness_const_test_set_predictions_8.csv
+./fairness_const_test_set_predictions_9.csv

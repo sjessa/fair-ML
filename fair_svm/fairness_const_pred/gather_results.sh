@@ -10,7 +10,7 @@ echo -n Raw Data >> fair_logr_acc_crime_comparison.csv
 python ../../code/metrics/metrics.py black crime ../../code/metrics/crime_clean.csv False | cut -d' ' -f3 | paste -sd ',' >> fair_logr_acc_crime_comparison.csv
 
 find ./ -maxdepth 1 -name "*acc*" -name "*.csv*" ! -name "*logr*" -print > predictions_list.txt
-
+echo "$(sort predictions_list.txt)" > predictions_list.txt
 
 while read prediction
 do
@@ -37,7 +37,7 @@ echo -n Raw Data >> fair_logr_fairness_crime_comparison.csv
 python ../../code/metrics/metrics.py black crime ../../code/metrics/crime_clean.csv False | cut -d' ' -f3 | paste -sd ',' >> fair_logr_fairness_crime_comparison.csv
 
 find ./ -maxdepth 1 -name "*fairness*" -name "*.csv*" ! -name "*logr*" -print > predictions_list.txt
-
+echo "$(sort predictions_list.txt)" > predictions_list.txt
 
 while read prediction
 do
