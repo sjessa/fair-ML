@@ -20,6 +20,37 @@ library(magrittr)
 source("measures.R")
 ```
 
+
+```{r logr-prep, echo = FALSE}
+
+logr_acc <- list.files("../fair_svm/fairness_const_pred/", "*accuracy*",
+                       full.names = TRUE) %>% 
+  lapply(read_csv, skip = 1,
+         col_names = c("fold", "accuracy", "precision", "recall", "F1", "drop")) %>% 
+  lapply(summarise_at, vars(accuracy, precision, recall, F1), mean)
+
+logr_acc[[1]] <- logr_acc[[1]] %>% mutate(model = "logr", method = "Accuracy-constrained LR",
+                                          dataset = "crime")
+logr_acc[[2]] <- logr_acc[[2]] %>% mutate(model = "logr", method = "Fairness-constrained LR",
+                                          dataset = "crime")
+logr_acc_all <- bind_rows(logr_acc)
+
+logr_comp <- list.files("../fair_svm/fairness_const_pred/", "*comparison*",
+                        full.names = TRUE) %>% 
+  lapply(read_csv, skip = 1,
+         col_names = c("fold", "impact_ratio", "elift_ratio", "odds_ratio", "drop")) %>% 
+  lapply(summarise_at, vars(impact_ratio, elift_ratio, odds_ratio), mean)
+
+logr_comp[[1]] <- logr_comp[[1]] %>% mutate(model = "logr", method = "Accuracy-constrained LR",
+                                            dataset = "crime")
+logr_comp[[2]] <- logr_comp[[2]] %>% mutate(model = "logr", method = "Fairness-constrained LR",
+                                            dataset = "crime")
+
+logr_comp_all <- bind_rows(logr_comp)
+
+
+```
+
 # ROC curves
 
 ```{r roc-prep, echo = FALSE}
@@ -55,7 +86,7 @@ auc <- Map(function(df, nm) mutate(df, method = nm), auc_list, auc_methods) %>%
 
 roc %>% ggplot(aes(x = fpr, y = tpr, colour = method)) +
   geom_line() +
-  facet_wrap(~ model) +
+  facet_wrap(~ model, drop = TRUE) +
   xlab("FPR") + ylab("TPR") +
   ggtitle("ROC curves for discrimination-reduction methods") +
   guides(colour = guide_legend(title = "Method")) +
@@ -93,10 +124,13 @@ acc <- list.files("../code/metrics", "*accuracy.csv$", full.names = TRUE, recurs
     grepl("unisample", .$method) ~ "Uniform sampling",
     grepl("2nb", .$method) ~ "2 Naive Bayes",
     TRUE ~ "None"
-  ))
+  )) %>% 
+  bind_rows(logr_acc_all)
 
 acc$method = factor(acc$method, levels = c("None", "Massaging", "Reweighting",
-                                           "Uniform sampling", "2 Naive Bayes"))
+                                           "Uniform sampling", "2 Naive Bayes",
+                                           "Accuracy-constrained LR",
+                                           "Fairness-constrained LR"))
 
 ```
 
@@ -107,7 +141,7 @@ acc %>% gather(statistic, value, accuracy, precision, recall, F1) %>%
   geom_bar(stat = "identity", aes(fill = method, colour = method), position = "dodge") +
   xlab(NULL) + ylab(NULL) +
   guides(fill = guide_legend(title = "Method", nrow = 2), colour = guide_legend(title = "Method")) +
-  facet_grid(model ~ dataset) +
+  facet_grid(model ~ dataset, drop = TRUE) +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 20, hjust = 1),
         legend.position = "bottom", panel.grid.major = element_blank(),
@@ -151,9 +185,14 @@ comp_tidy <- comp %>%
     grepl("gnb", .$model) ~ "gnb",
     TRUE ~ "Dataset"
   )) %>%
-  select(-matches("drop"))
+  select(-matches("drop")) %>% 
+  bind_rows(logr_comp_all)
 
-comp_tidy$method = factor(comp_tidy$method, levels = c("None", "Massaging", "Reweighting", "Uniform sampling", "2 Naive Bayes"))
+comp_tidy$method = factor(comp_tidy$method,
+                          levels = c("None", "Massaging", "Reweighting",
+                                     "Uniform sampling", "2 Naive Bayes",
+                                     "Accuracy-constrained LR",
+                                     "Fairness-constrained LR"))
 
 ```
 
@@ -166,7 +205,7 @@ comp_tidy %>% gather(measure, value, impact_ratio, odds_ratio, elift_ratio) %>%
   guides(fill = guide_legend(title = "Model")) +
   scale_fill_manual(values = c("gray", "darkred", "darkblue", "darkviolet")) +
   xlab("Method") + ylab("Discrimination") +
-  facet_grid(measure ~ dataset) +
+  facet_grid(measure ~ dataset, drop = TRUE) +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 20, hjust = 1, size = 8),
         legend.position = "bottom", panel.grid.major = element_blank(),
@@ -205,6 +244,11 @@ accuracy <- c(crime_acc, recid_acc)
 
 all <- data.frame(metadata, dataset, elift_ratio, impact_ratio, odds_ratio, accuracy)
 
+logr_all <- inner_join(logr_acc_all, logr_comp_all,
+                       by = c("method", "model", "dataset")) %>%
+  gather(measure, value, elift_ratio, impact_ratio, odds_ratio) %>%
+  select(-c(precision, recall, F1))
+
 all_tidy <- all %>% gather(measure, value, elift_ratio, impact_ratio, odds_ratio) %>%
   separate(metadata, into = c("method", "drop", "model"), sep = "_") %>% 
   separate(method, into = c("drop1", "drop2", "drop3", "method"), sep = "/") %>%
@@ -217,9 +261,13 @@ all_tidy <- all %>% gather(measure, value, elift_ratio, impact_ratio, odds_ratio
     grepl("unisample", .$method) ~ "Uniform sampling",
     grepl("2nb", .$method) ~ "2 Naive Bayes",
     TRUE ~ "None"
-  ))
+  )) %>% 
+  bind_rows(logr_all)
 
-all_tidy$method = factor(all_tidy$method, levels = c("None", "Massaging", "Reweighting", "Uniform sampling", "2 Naive Bayes"))
+all_tidy$method = factor(all_tidy$method, levels = c("None", "Massaging", "Reweighting",
+                                                     "Uniform sampling", "2 Naive Bayes",
+                                                     "Accuracy-constrained LR",
+                                                     "Fairness-constrained LR"))
 
 
 ```
@@ -229,12 +277,12 @@ all_tidy$method = factor(all_tidy$method, levels = c("None", "Massaging", "Rewei
 all_tidy %>% 
   ggplot(aes(x = value, y = accuracy)) +
   geom_point(aes(colour = method, shape = model), size = 2) +
-  guides(colour = guide_legend(title = "Method", nrow = 3)) +
+  guides(colour = guide_legend(title = "Method", ncol = 2)) +
   guides(shape = guide_legend(title = "Model")) +
   ylim(0, 1) +
   xlab("Discrimination") +
   geom_text_repel(aes(x = value, y = accuracy, label = model), size = 2) +
-  facet_grid(measure ~ dataset) +
+  facet_grid(measure ~ dataset, drop = TRUE) +
   theme_bw() +
   theme(legend.position = "bottom") +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
@@ -293,7 +341,7 @@ thresh %>% gather(statistic, value, elift, impact, odds, acc) %>%
   geom_line(aes(colour = method, linetype = model)) +
   guides(colour = guide_legend(title = "Method", nrow = 3)) +
   guides(linetype = guide_legend(title = "Model")) +
-  facet_grid(statistic ~ dataset, switch = "y") +
+  facet_grid(statistic ~ dataset, switch = "y", drop = TRUE) +
   theme_bw() +
   theme(legend.position = "bottom", panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
