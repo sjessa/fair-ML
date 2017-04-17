@@ -6,15 +6,15 @@ echo "gathering in process..... please wait"
 
 # accuracy constrained
 echo ,IMPACT RATIO:,ELIFT RATIO:,ODDS RATIO:, > fair_logr_acc_crime_comparison.csv
-echo -n Raw Data, >> fair_logr_acc_crime_comparison.csv 
+echo -n Raw Data >> fair_logr_acc_crime_comparison.csv 
 python ../../code/metrics/metrics.py black crime ../../code/metrics/crime_clean.csv False | cut -d' ' -f3 | paste -sd ',' >> fair_logr_acc_crime_comparison.csv
 
-find ./ -maxdepth 1 -name "*acc*" -name "*.csv*" -print > predictions_list.txt
-
+find ./ -maxdepth 1 -name "*acc*" -name "*.csv*" ! -name "*logr*" -print > predictions_list.txt
+echo "$(sort predictions_list.txt)" > predictions_list.txt
 
 while read prediction
 do
-    echo -n "$prediction", >> fair_logr_acc_crime_comparison.csv
+    echo -n "$prediction" >> fair_logr_acc_crime_comparison.csv
        	python ../../code/metrics/metrics.py black prediction "$prediction" False | cut -d' ' -f3 | paste -sd ',' >> fair_logr_acc_crime_comparison.csv
     
 done < predictions_list.txt
@@ -33,15 +33,15 @@ rm predictions_list.txt
 
 # fairness constrained
 echo ,IMPACT RATIO:,ELIFT RATIO:,ODDS RATIO:, > fair_logr_fairness_crime_comparison.csv
-echo -n Raw Data, >> fair_logr_fairness_crime_comparison.csv 
+echo -n Raw Data >> fair_logr_fairness_crime_comparison.csv 
 python ../../code/metrics/metrics.py black crime ../../code/metrics/crime_clean.csv False | cut -d' ' -f3 | paste -sd ',' >> fair_logr_fairness_crime_comparison.csv
 
-find ./ -maxdepth 1 -name "*fairness*" -name "*.csv*" -print > predictions_list.txt
-
+find ./ -maxdepth 1 -name "*fairness*" -name "*.csv*" ! -name "*logr*" -print > predictions_list.txt
+echo "$(sort predictions_list.txt)" > predictions_list.txt
 
 while read prediction
 do
-    echo -n "$prediction", >> fair_logr_fairness_crime_comparison.csv
+    echo -n "$prediction" >> fair_logr_fairness_crime_comparison.csv
        	python ../../code/metrics/metrics.py black prediction "$prediction" False | cut -d' ' -f3 | paste -sd ',' >> fair_logr_fairness_crime_comparison.csv
     
 done < predictions_list.txt
