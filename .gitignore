@@ -3,6 +3,7 @@
 #     Project-specific                        #
 # ------------------------------------------- #
 
+analysis/analysis_cache/*
 code/output/*unisample*.csv
 */.RData
 */.Rhistory
