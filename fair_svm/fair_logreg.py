@@ -12,8 +12,12 @@ def sigmoid(x):
 
 def load_data():
     data = pd.read_csv('../data/crime/crime_clean.tsv', sep = '\t')
+    data['id'] = data.index
+
     data = shuffle(data)
-    X = data.drop(['crime', 'black'], axis = 1)
+    shuffled_id_arr = data['id']
+
+    X = data.drop(['crime', 'black', 'id'], axis = 1)
     X = X.as_matrix()
 
     n, dim = X.shape
@@ -22,7 +26,7 @@ def load_data():
 
     s = np.asarray(data['black'].tolist())
     y = np.asarray(data['crime'].tolist())
-    return X, s, y
+    return X, s, y, shuffled_id_arr
 
 
 class log_reg_acc_const:
@@ -74,7 +78,7 @@ class log_reg_acc_const:
         self.w = res.x
 
     def predict(self, X):
-        return sigmoid(X.dot(self.w))
+        return np.round(sigmoid(X.dot(self.w)))
 
 
 class log_reg_fairness_const:
@@ -126,37 +130,36 @@ class log_reg_fairness_const:
         self.w = res.x
 
     def predict(self, X):
-        return sigmoid(X.dot(self.w))
+        return np.round(sigmoid(X.dot(self.w)))
 
 def cross_val(classifier, run):
-    X, s, y = load_data()
-
-    roc = pd.DataFrame()
+    X, s, y, shuffled_id_arr = load_data()
 
     cv = KFold(n_splits=10, shuffle=False)
 
     mean_tpr = 0.0
     mean_fpr = np.linspace(0, 1, 100)
 
-
+    pred = pd.DataFrame(columns=['id', 'actual', 'prediction'])
+    split = 0
     for train, test in cv.split(X):
+        split+=1
         X_train, X_test = X[train, :], X[test, :]
         s_train, s_test = s[train], s[test]
         y_train, y_test = y[train], y[test]
+        test_id_arr = shuffled_id_arr[test]
 
         classifier.fit(X_train, s_train, y_train)
         preds_k = classifier.predict(X_test)
-        pred = pd.DataFrame(preds_k)
-        pred.to_csv('fairness_const_test_set_predictions_' + str(run)+'.csv')
+        pred.loc[pred['id'].isin(test_id_arr), 'prediction'] = preds_k
         fpr, tpr, thresholds = roc_curve(y_test, preds_k)
 
         mean_tpr += interp(mean_fpr, fpr, tpr)
         mean_tpr[0] = 0.0
 
-
+    pred.to_csv('fairness_const_pred/fairness_const_test_set_predictions_'+str(run)+'.csv')
     roc = pd.DataFrame({'tpr': mean_tpr, 'fpr': mean_fpr})
 
-    roc.to_csv(str(classifier)+str(run)+"_roc.csv", index=False)
     plt.scatter(roc['tpr'], roc['fpr'])
     mean_tpr /= 10
     mean_tpr[-1] = 1.0
