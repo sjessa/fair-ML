@@ -1,12 +1,18 @@
-,Sex:
-,IMPACT RATIO:,ELIFT RATIO:,ODDS RATIO:,
-Raw Data,1.08709112237,1.07554557682,1.32698190208,
-
-,Hispanic:
-,IMPACT RATIO:,ELIFT RATIO:,ODDS RATIO:,
-Raw Data,1.1870393029,1.17308475771,1.93606243722,
-
-,Non-White:
 ,IMPACT RATIO:,ELIFT RATIO:,ODDS RATIO:,
 Raw Data,0.980765000012,0.985836709083,0.941274472838,
-
+../output/recidivism-reweighed_predictions_logr.csv,0.998827510052,0.99914083357,0.68646239396,
+../output/recidivism2nb_predictions_gnb.csv,1.00412746729,1.9302175417,1.08817254661,
+../output/recidivism-massage_predictions_gnb.csv,0.995431033944,0.996648949849,0.923917510292,
+../output/recidivism-reweighed_predictions_gnb.csv,1.00004726688,1.0000346245,1.00032905859,
+../output/recidivism-massage_predictions_svm.csv,1.0,1.0,ind,
+../output/recidivism-massage_predictions_logr.csv,0.997422981783,0.998110926366,0.85713262419,
+../output/recidivism-reweighed_predictions_svm.csv,1.0,1.0,ind,
+../output/recidivism_massaged.csv,0.999595377022,0.999703564984,0.998727928037,
+../output/recidivism_reweighed.csv,0.980765000012,0.985836709083,0.941274472838,
+../output/recidivism-reweighed_predictions_logr.csv,0.998827510052,0.99914083357,0.68646239396,
+../output/recidivism2nb_predictions_gnb.csv,1.00412746729,1.9302175417,1.08817254661,
+../output/recidivism-massage_predictions_gnb.csv,0.995431033944,0.996648949849,0.923917510292,
+../output/recidivism-reweighed_predictions_gnb.csv,1.00004726688,1.0000346245,1.00032905859,
+../output/recidivism-massage_predictions_svm.csv,1.0,1.0,ind,
+../output/recidivism-massage_predictions_logr.csv,0.997422981783,0.998110926366,0.85713262419,
+../output/recidivism-reweighed_predictions_svm.csv,1.0,1.0,ind,

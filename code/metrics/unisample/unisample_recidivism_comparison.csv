@@ -1,0 +1,7 @@
+,IMPACT RATIO:,ELIFT RATIO:,ODDS RATIO:,
+Raw Data,0.980765000012,0.985836709083,0.941274472838,
+./unisample_predictions_logr.csv
+./unisample_predictions_gnb.csv
+./recidivism_unisample.csv,0.999595377022,0.999703564984,0.998727928037,
+./recidivism-unisample_predictions_logr.csv,0.999618219322,0.999720301426,0.976546284308,
+./recidivism-unisample_predictions_gnb.csv,0.996680599077,0.997566241908,0.943694042547,

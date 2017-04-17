@@ -84,7 +84,7 @@ x_scaled = min_max_scaler.fit_transform(x)
 data2 = pd.DataFrame(x_scaled)
 data2.columns = data.columns
 
-data2.to_csv('./metrics/3-Year_Recidivism_for_Offenders_Released_from_Prison_PREPROCESSED.csv')
+data2.to_csv('./metrics/recidivism_clean.csv')
 
 
 

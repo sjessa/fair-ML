@@ -7,8 +7,8 @@ echo ,IMPACT RATIO:,ELIFT RATIO:,ODDS RATIO:, > crime_comparison.csv
 echo -n Raw Data, >> crime_comparison.csv 
 python metrics.py black crime crime_clean.csv False | cut -d' ' -f3 | paste -sd ',' >> crime_comparison.csv
 
-find ../output -maxdepth 1 -name "*crime*" -print > predictions_list.txt
-find ../output -maxdepth 1 -name "*pred*" -print >> predictions_list.txt
+find ../output -maxdepth 1 -name "*crime_*" ! -name "*recidivism*" -print > predictions_list.txt
+find ../output -maxdepth 1 -name "*pred*" ! -name "*recidivism*" -print >> predictions_list.txt
 
 while read prediction
 do
@@ -23,7 +23,7 @@ done < predictions_list.txt
 echo ,ACCURACY:,PRECISION:,RECALL:,F1 SCORE:, > crime_accuracy.csv
 
 rm predictions_list.txt
-find ../output -maxdepth 1 -name "*pred*" -print > predictions_list.txt
+find ../output -maxdepth 1 -name "*pred*" ! -name "*recidivism*" -print > predictions_list.txt
 
 while read prediction2
 do

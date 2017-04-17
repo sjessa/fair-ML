@@ -9,10 +9,18 @@ This script will print the Impact Ratio, Elift Ratio, and Odds Ratio according t
 
 # instructions for gathering results 
 
-To collect the results from all the learners thus far, simply run the `gathering_results.sh` script. 
+To collect the results for the crime dataset from all the learners thus far, simply run the `crime_gathering_results.sh` script. 
 
 ```
-./gathering_results.sh
+./crime_gathering_results.sh
 ```
 
-The discrimination metrics for each of the classifiers will be written in `comparison.csv`, and the accuracy metrics for each of the predictions will be written in `accuracy.csv`.
+The discrimination metrics for each of the classifiers will be written in `crime_comparison.csv`, and the accuracy metrics for each of the predictions will be written in `crime_accuracy.csv`.
+
+To collect the results for the recidivism dataset from all the learners thus far, simply run the `recidivism_gathering_results.sh` script. 
+
+```
+./recidivism_gathering_results.sh
+```
+
+The discrimination metrics for each of the classifiers will be written in `recidivism_comparison.csv`. 

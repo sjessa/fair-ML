@@ -1,10 +1,7 @@
-../output/massage_predictions_logr.csv
-../output/massage_predictions_svm.csv
-../output/baseline_predictions_logr.csv
-../output/reweighed_predictions_logr.csv
-../output/reweighed_predictions_gnb.csv
-../output/2nb_predictions_gnb.csv
-../output/massage_predictions_gnb.csv
-../output/baseline_predictions_svm.csv
-../output/reweighed_predictions_svm.csv
-../output/baseline_predictions_gnb.csv
+../output/recidivism-reweighed_predictions_logr.csv
+../output/recidivism2nb_predictions_gnb.csv
+../output/recidivism-massage_predictions_gnb.csv
+../output/recidivism-reweighed_predictions_gnb.csv
+../output/recidivism-massage_predictions_svm.csv
+../output/recidivism-massage_predictions_logr.csv
+../output/recidivism-reweighed_predictions_svm.csv
