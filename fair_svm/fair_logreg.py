@@ -140,7 +140,10 @@ def cross_val(classifier, run):
     mean_tpr = 0.0
     mean_fpr = np.linspace(0, 1, 100)
 
-    pred = pd.DataFrame(columns=['id', 'actual', 'prediction'])
+    pred = pd.DataFrame(columns=['id', 'black', 'actual', 'prediction'])
+    pred['id'] = shuffled_id_arr
+    pred['actual'] = y
+    pred['black'] = s
     split = 0
     for train, test in cv.split(X):
         split+=1
