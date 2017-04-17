@@ -1,0 +1,290 @@
+---
+title: "analysis"
+author: "Selin Jessa"
+date: "April 16, 2017"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(dev = "pdf",
+                      fig.keep = "all",
+                      fig.path = "../figures/",
+                      message = FALSE,
+                      warning = FALSE,
+                      error = FALSE,
+                      cache = TRUE)
+
+library(tidyverse)
+library(magrittr)
+source("measures.R")
+```
+
+# ROC curves
+
+```{r roc-prep, echo = FALSE}
+
+roc_paths <- list.files("../code/output/", pattern = "*roc*", full.names = TRUE)
+roc_list <- roc_paths %>% lapply(read_csv)
+roc <- Map(function(df, nm) mutate(df, method_model = nm), roc_list, roc_paths) %>% 
+  bind_rows() %>%
+  separate(method_model, into = c("method", "data", "model"), sep = "_") %>%
+  mutate(method = substr(method, 17, nchar(method)),
+         model = substr(model, 1, nchar(model)-4)) %>% 
+  mutate(method = case_when(
+    .$method == "baseline" ~ "None",
+    .$method == "massage" ~ "Massaging",
+    .$method == "reweighed" ~ "Reweighting",
+    .$method == "unisample" ~ "Uniform sampling",
+    .$method == "2nb" ~ "2 Naive Bayes"
+  )) %>% 
+  select(-data) %>% 
+  filter(!is.na(method))
+
+roc$method = factor(roc$method, levels = c("None", "Massaging", "Reweighting", "Uniform sampling", "2 Naive Bayes"))
+
+auc_methods <- c("baseline", "massage", "reweighed", "2nb")
+auc_list <- list.files("../code/output", pattern = "*auc*", full.names = TRUE) %>% 
+  lapply(read_csv)
+
+auc <- Map(function(df, nm) mutate(df, method = nm), auc_list, auc_methods) %>% 
+  bind_rows
+```
+
+```{r roc, fig.height = 3.5, fig.width = 10}
+
+roc %>% ggplot(aes(x = fpr, y = tpr, colour = method)) +
+  geom_line() +
+  facet_wrap(~ model) +
+  xlab("FPR") + ylab("TPR") +
+  ggtitle("ROC curves for discrimination-reduction methods") +
+  guides(colour = guide_legend(title = "Method")) +
+  theme_bw()
+
+```
+
+# Accuracy
+
+```{r acc-prep, echo = FALSE}
+
+replace <- function(df) {
+  df[df=="ind"]<-NA
+  
+  return(df)
+}
+
+acc <- list.files("../code/metrics", "*accuracy.csv$", full.names = TRUE, recursive = TRUE) %>% 
+  lapply(read_csv, col_names = c("metadata", "accuracy", "precision", "recall", "F1", "drop0"), skip = 1) %>% 
+  lapply(replace) %>% 
+  lapply(mutate, recall = as.numeric(recall)) %>% 
+  lapply(mutate, F1 = as.numeric(F1)) %>% 
+  bind_rows() %>% 
+  separate(metadata, into = c("method", "drop", "model"), sep = "_") %>%
+  mutate(dataset = ifelse(grepl("recidivism", method), "recidivism", "crime")) %>% 
+  #separate(method, into = c("drop1", "drop2", "method"), sep = "/") #%>% 
+  separate(model, into = c("model", "drop3")) %>% 
+  select(-matches("drop")) %>% 
+  mutate(method = case_when(
+    grepl("baseline", .$method) ~ "None",
+    grepl("massage", .$method) ~ "Massaging",
+    grepl("reweighed", .$method) ~ "Reweighting",
+    grepl("unisample", .$method) ~ "Uniform sampling",
+    grepl("2nb", .$method) ~ "2 Naive Bayes",
+    TRUE ~ "None"
+  ))
+
+acc$method = factor(acc$method, levels = c("None", "Massaging", "Reweighting",
+                                           "Uniform sampling", "2 Naive Bayes"))
+
+```
+
+```{r accuracy, fig.width = 5, fig.height = 7.5}
+
+acc %>% gather(statistic, value, accuracy, precision, recall, F1) %>%
+  ggplot(aes(x = statistic, y = value)) +
+  geom_bar(stat = "identity", aes(fill = method, colour = method), position = "dodge") +
+  xlab(NULL) + ylab(NULL) +
+  guides(fill = guide_legend(title = "Method", nrow = 2), colour = guide_legend(title = "Method")) +
+  facet_grid(model ~ dataset) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 20, hjust = 1),
+        legend.position = "bottom")
+
+```
+
+# Discrimination
+
+```{r measures-prep, echo = FALSE}
+
+comp <- list.files("../code/metrics", pattern = "*comparison.csv$", recursive = TRUE, full.names = TRUE) %>% 
+  lapply(read_csv, skip = 1, col_names = c("metadata", "impact_ratio", "elift_ratio", "odds_ratio", "drop")) %>%
+  lapply(replace) %>% 
+  lapply(mutate, odds_ratio = as.numeric(odds_ratio))
+
+comp[[1]]$metadata[1] <- "../output/crime_raw"
+comp[[2]]$metadata[1] <- "../output/recidivism_raw"
+comp[[3]]$metadata[1] <- NA
+comp[[4]]$metadata[1] <- NA
+
+comp_tidy <- comp %>%
+  bind_rows() %>%
+  filter(!is.na(metadata)) %>%
+  separate(metadata, into = c("method", "drop2", "model"), sep = "_") %>% 
+  mutate(dataset = ifelse(grepl("recidivism", method), "recidivism", "crime")) %>%
+  mutate(method = ifelse(is.na(model), drop2, method)) %>%
+  mutate(method = case_when(
+    grepl("baseline", .$method) ~ "None",
+    grepl("massage", .$method) ~ "Massaging",
+    grepl("reweighed", .$method) ~ "Reweighting",
+    grepl("unisample", .$method) ~ "Uniform sampling",
+    grepl("2nb", .$method) ~ "2 Naive Bayes",
+    TRUE ~ "None"
+  )) %>%
+  mutate(model = case_when(
+    grepl("logr", .$model) ~ "logr",
+    grepl("svm", .$model) ~ "svm",
+    grepl("gnb", .$model) ~ "gnb",
+    TRUE ~ "Dataset"
+  )) %>%
+  select(-matches("drop"))
+
+comp_tidy$method = factor(comp_tidy$method, levels = c("None", "Massaging", "Reweighting", "Uniform sampling", "2 Naive Bayes"))
+
+```
+
+
+```{r measures, fig.width = 5, fig.height = 8}
+
+comp_tidy %>% gather(measure, value, impact_ratio, odds_ratio, elift_ratio) %>%
+  ggplot(aes(x = method, y = value)) +
+  geom_bar(stat = "identity", aes(fill = model), position = "dodge") +
+  guides(fill = guide_legend(title = "Model")) +
+  scale_fill_manual(values = c("gray", "darkred", "darkblue", "darkviolet")) +
+  xlab(NULL) + ylab("Discrimination") +
+  facet_grid(measure ~ dataset, switch = "y") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 20, hjust = 1, size = 8),
+        legend.position = "bottom")
+
+```
+
+
+# Accuracy vs. discrimination
+
+```{r tradeoff-prep, echo = FALSE}
+
+recid_paths <- list.files("../code/output", pattern = "*recidivism.*predictions*", full.names = TRUE)
+crime_paths <- setdiff(list.files("../code/output", pattern = "*predictions*", full.names = TRUE), recid_paths)
+
+crime <- crime_paths %>% lapply(read_csv) %>% lapply(filter, !is.na(pred))
+recid <- recid_paths %>% lapply(read_csv)
+
+crime_elift  <- crime %>% lapply(disc, "elift", "black", 1, "pred", 0) %>% unlist
+crime_impact <- crime %>% lapply(disc, "impact", "black", 1, "pred", 0) %>% unlist
+crime_odds   <- crime %>% lapply(disc, "odds", "black", 1, "pred", 0) %>% unlist
+crime_acc    <- crime %>% lapply(getaccuracy, "pred", "class") %>% unlist
+
+recid_elift  <- recid %>% lapply(disc, "elift", "non_white", 1, "pred", 0) %>% unlist
+recid_impact <- recid %>% lapply(disc, "impact", "non_white", 1, "pred", 0) %>% unlist
+recid_odds   <- recid %>% lapply(disc, "odds", "non_white", 1, "pred", 0) %>% unlist
+recid_acc    <- recid %>% lapply(getaccuracy, "pred", "class") %>% unlist
+
+metadata <- c(crime_paths, recid_paths)
+dataset <- c(rep("crime", length(crime_paths)), rep("recidivism", length(recid_paths)))
+elift_ratio <- c(crime_elift, recid_elift)
+impact_ratio <- c(crime_impact, recid_impact)
+odds_ratio <- c(crime_odds, recid_odds)
+accuracy <- c(crime_acc, recid_acc)
+
+all <- data.frame(metadata, dataset, elift_ratio, impact_ratio, odds_ratio, accuracy)
+
+all_tidy <- all %>% gather(measure, value, elift_ratio, impact_ratio, odds_ratio) %>%
+  separate(metadata, into = c("method", "drop", "model"), sep = "_") %>% 
+  separate(method, into = c("drop1", "drop2", "drop3", "method"), sep = "/") %>%
+  separate(model, into = c("model", "drop4")) %>%
+  select(model, method, dataset, measure, value, accuracy) %>%
+  mutate(method = case_when(
+    grepl("baseline", .$method) ~ "None",
+    grepl("massage", .$method) ~ "Massaging",
+    grepl("reweighed", .$method) ~ "Reweighting",
+    grepl("unisample", .$method) ~ "Uniform sampling",
+    grepl("2nb", .$method) ~ "2 Naive Bayes",
+    TRUE ~ "None"
+  ))
+
+all_tidy$method = factor(all_tidy$method, levels = c("None", "Massaging", "Reweighting", "Uniform sampling", "2 Naive Bayes"))
+
+
+```
+
+```{r tradeoff, fig.width = 5, fig.height = 8}
+
+all_tidy %>% 
+  ggplot(aes(x = value, y = accuracy)) +
+  geom_point(aes(colour = method, shape = model), size = 2) +
+  guides(colour = guide_legend(title = "Method", nrow = 3)) +
+  guides(shape = guide_legend(title = "Model")) +
+  ylim(0, 1) +
+  xlab("Discrimination") +
+  #geom_text_repel(aes(x = value, y = accuracy, label = model)) +
+  facet_grid(measure ~ dataset, switch = "y") +
+  theme_bw() +
+  theme(legend.position = "bottom")
+
+```
+
+# Impact of threshold
+
+```{r threshold-prep, echo = FALSE}
+
+repredict <- function(df, protected_variable, method_str, model_str, dataset_str) {
+  
+  method <- rep(method_str, 11)
+  model <- rep(model_str, 11)
+  dataset <- rep(dataset_str, 11)
+  thresholds <- seq(0, 1, by = 0.1)
+  dfs <- rep(list(df), 11)
+  
+  dfs_pred <- Map(function(df1, threshold) mutate(df1, newpred = ifelse(pos > threshold, 1, 0)),
+                                             dfs, thresholds)
+  
+  elift  <- dfs_pred %>% lapply(disc, "elift", protected_variable, 1, "newpred", 0) %>% unlist
+  impact <- dfs_pred %>% lapply(disc, "impact", protected_variable, 1, "newpred", 0) %>% unlist
+  odds   <- dfs_pred %>% lapply(disc, "odds", protected_variable, 1, "newpred", 0) %>% unlist
+  acc    <- dfs_pred %>% lapply(getaccuracy, "newpred", "class") %>% unlist
+  
+  out <- data.frame(method, model, dataset, thresholds, elift, impact, odds, acc)
+  return(out)
+  
+}
+
+crime_models <- all_tidy %>% filter(dataset == "crime") %>% extract2("model")
+crime_methods <- all_tidy %>% filter(dataset == "crime") %>% extract2("method")
+
+crime_t <- Map(function(df, method, model) repredict(df, "black", method, model, "crime"),
+             crime, crime_methods, crime_models) %>% bind_rows()
+
+recid_models <- all_tidy %>% filter(dataset == "recidivism") %>% extract2("model")
+recid_methods <- all_tidy %>% filter(dataset == "recidivism") %>% extract2("method")
+
+recid_t <- Map(function(df, method, model) repredict(df, "non_white", method, model, "recidivism"),
+             recid, recid_methods, recid_models) %>% bind_rows()
+
+thresh <- bind_rows(crime_t, recid_t)
+thresh$method = factor(thresh$method, levels = c("None", "Massaging", "Reweighting", "Uniform sampling", "2 Naive Bayes"))
+
+
+```
+
+```{r threshold, fig.width = 4, fig.height = 7}
+
+thresh %>% gather(statistic, value, elift, impact, odds, acc) %>%
+  ggplot(aes(x = thresholds, y = value)) +
+  xlab("Decision threshold") + ylab(NULL) +
+  geom_line(aes(colour = method, linetype = model)) +
+  guides(colour = guide_legend(title = "Method", nrow = 3)) +
+  guides(linetype = guide_legend(title = "Model")) +
+  facet_grid(statistic ~ dataset, switch = "y") +
+  theme_bw() +
+  theme(legend.position = "bottom")
+
+```
