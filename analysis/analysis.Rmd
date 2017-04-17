@@ -15,6 +15,7 @@ knitr::opts_chunk$set(dev = "pdf",
                       cache = TRUE)
 
 library(tidyverse)
+library(ggrepel)
 library(magrittr)
 source("measures.R")
 ```
@@ -58,7 +59,9 @@ roc %>% ggplot(aes(x = fpr, y = tpr, colour = method)) +
   xlab("FPR") + ylab("TPR") +
   ggtitle("ROC curves for discrimination-reduction methods") +
   guides(colour = guide_legend(title = "Method")) +
-  theme_bw()
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        panel.background = element_blank(), axis.line = element_line(colour = "black"))
 
 ```
 
@@ -107,7 +110,10 @@ acc %>% gather(statistic, value, accuracy, precision, recall, F1) %>%
   facet_grid(model ~ dataset) +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 20, hjust = 1),
-        legend.position = "bottom")
+        legend.position = "bottom", panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(), axis.line = element_line(colour = "black"))
+
 
 ```
 
@@ -159,11 +165,13 @@ comp_tidy %>% gather(measure, value, impact_ratio, odds_ratio, elift_ratio) %>%
   geom_bar(stat = "identity", aes(fill = model), position = "dodge") +
   guides(fill = guide_legend(title = "Model")) +
   scale_fill_manual(values = c("gray", "darkred", "darkblue", "darkviolet")) +
-  xlab(NULL) + ylab("Discrimination") +
-  facet_grid(measure ~ dataset, switch = "y") +
+  xlab("Method") + ylab("Discrimination") +
+  facet_grid(measure ~ dataset) +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 20, hjust = 1, size = 8),
-        legend.position = "bottom")
+        legend.position = "bottom", panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(), axis.line = element_line(colour = "black"))
 
 ```
 
@@ -225,10 +233,12 @@ all_tidy %>%
   guides(shape = guide_legend(title = "Model")) +
   ylim(0, 1) +
   xlab("Discrimination") +
-  #geom_text_repel(aes(x = value, y = accuracy, label = model)) +
-  facet_grid(measure ~ dataset, switch = "y") +
+  geom_text_repel(aes(x = value, y = accuracy, label = model), size = 2) +
+  facet_grid(measure ~ dataset) +
   theme_bw() +
-  theme(legend.position = "bottom")
+  theme(legend.position = "bottom") +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        panel.background = element_blank(), axis.line = element_line(colour = "black"))
 
 ```
 
@@ -285,6 +295,9 @@ thresh %>% gather(statistic, value, elift, impact, odds, acc) %>%
   guides(linetype = guide_legend(title = "Model")) +
   facet_grid(statistic ~ dataset, switch = "y") +
   theme_bw() +
-  theme(legend.position = "bottom")
+  theme(legend.position = "bottom", panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(), axis.line = element_line(colour = "black"))
+
 
 ```
