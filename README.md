@@ -43,11 +43,11 @@ $ python two_naive_bayes.py
 
 This runs the 2NB approach proposed by Calders & Verwer (2010), and measures the discrimination in the resulting labels.
 
+### Gather results
+
+Compute discrimination by all measures and collect the results: see README in `code/metrics`.
+
 ### Analyze the results
 
-Plot ROC curves:
-```
-$ cd ../analysis
-$ Rscript compare_preprocessing_methods.R
-```
+The document which runs the majority of analysis exists in `analysis/analysis.Rmd`. This can be opened in RStudio and "knit" using the `knitr` package for R. Results will be produced in the `figures` directory.
 
