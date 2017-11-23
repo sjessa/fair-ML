@@ -82,17 +82,18 @@ auc <- Map(function(df, nm) mutate(df, method = nm), auc_list, auc_methods) %>%
   bind_rows
 ```
 
-```{r roc, fig.height = 3.5, fig.width = 10}
+```{r roc, fig.height = 3.4, fig.width = 7}
 
 roc %>% ggplot(aes(x = fpr, y = tpr, colour = method)) +
   geom_line() +
   facet_wrap(~ model, drop = TRUE) +
   xlab("FPR") + ylab("TPR") +
-  ggtitle("ROC curves for discrimination-reduction methods") +
+  #ggtitle("ROC curves for discrimination-reduction methods") +
   guides(colour = guide_legend(title = "Method")) +
   theme_bw() +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-        panel.background = element_blank(), axis.line = element_line(colour = "black"))
+        panel.background = element_blank(), axis.line = element_line(colour = "black"),
+        legend.position = "bottom")
 
 ```
 
@@ -134,14 +135,14 @@ acc$method = factor(acc$method, levels = c("None", "Massaging", "Reweighting",
 
 ```
 
-```{r accuracy, fig.width = 5, fig.height = 7.5}
+```{r accuracy, fig.width = 7, fig.height = 5}
 
 acc %>% gather(statistic, value, accuracy, precision, recall, F1) %>%
   ggplot(aes(x = statistic, y = value)) +
   geom_bar(stat = "identity", aes(fill = method, colour = method), position = "dodge") +
   xlab(NULL) + ylab(NULL) +
   guides(fill = guide_legend(title = "Method", nrow = 2), colour = guide_legend(title = "Method")) +
-  facet_grid(model ~ dataset, drop = TRUE) +
+  facet_grid(dataset ~ model, drop = TRUE) +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 20, hjust = 1),
         legend.position = "bottom", panel.grid.major = element_blank(),
@@ -197,7 +198,7 @@ comp_tidy$method = factor(comp_tidy$method,
 ```
 
 
-```{r measures, fig.width = 5, fig.height = 8}
+```{r measures, fig.width = 7, fig.height = 5}
 
 comp_tidy %>% gather(measure, value, impact_ratio, odds_ratio, elift_ratio) %>%
   ggplot(aes(x = method, y = value)) +
@@ -205,7 +206,7 @@ comp_tidy %>% gather(measure, value, impact_ratio, odds_ratio, elift_ratio) %>%
   guides(fill = guide_legend(title = "Model")) +
   scale_fill_manual(values = c("gray", "darkred", "darkblue", "darkviolet")) +
   xlab("Method") + ylab("Discrimination") +
-  facet_grid(measure ~ dataset, drop = TRUE) +
+  facet_grid(dataset ~ measure, drop = TRUE, scales = "free") +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 20, hjust = 1, size = 8),
         legend.position = "bottom", panel.grid.major = element_blank(),
@@ -272,17 +273,17 @@ all_tidy$method = factor(all_tidy$method, levels = c("None", "Massaging", "Rewei
 
 ```
 
-```{r tradeoff, fig.width = 5, fig.height = 8}
+```{r tradeoff, fig.width = 7, fig.height = 5}
 
 all_tidy %>% 
   ggplot(aes(x = value, y = accuracy)) +
   geom_point(aes(colour = method, shape = model), size = 2) +
-  guides(colour = guide_legend(title = "Method", ncol = 2)) +
+  guides(colour = guide_legend(title = "Method", nrow = 2)) +
   guides(shape = guide_legend(title = "Model")) +
   ylim(0, 1) +
-  xlab("Discrimination") +
+  xlab("Discrimination") + ylab("Accuracy") +
   geom_text_repel(aes(x = value, y = accuracy, label = model), size = 2) +
-  facet_grid(measure ~ dataset, drop = TRUE) +
+  facet_grid(dataset ~ measure, drop = TRUE) +
   theme_bw() +
   theme(legend.position = "bottom") +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
@@ -333,19 +334,18 @@ thresh$method = factor(thresh$method, levels = c("None", "Massaging", "Reweighti
 
 ```
 
-```{r threshold, fig.width = 4, fig.height = 7}
+```{r threshold, fig.width = 6, fig.height = 4.5}
 
 thresh %>% gather(statistic, value, elift, impact, odds, acc) %>%
   ggplot(aes(x = thresholds, y = value)) +
-  xlab("Decision threshold") + ylab(NULL) +
+  xlab("Decision threshold") + ylab("Discrimination") +
   geom_line(aes(colour = method, linetype = model)) +
-  guides(colour = guide_legend(title = "Method", nrow = 3)) +
+  guides(colour = guide_legend(title = "Method", nrow = 2)) +
   guides(linetype = guide_legend(title = "Model")) +
-  facet_grid(statistic ~ dataset, switch = "y", drop = TRUE) +
+  facet_grid(dataset ~ statistic, drop = TRUE) +
   theme_bw() +
   theme(legend.position = "bottom", panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         panel.background = element_blank(), axis.line = element_line(colour = "black"))
-
 
 ```
